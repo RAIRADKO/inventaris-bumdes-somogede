@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BusinessUnitController;
 use App\Http\Controllers\CashController;
+use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\JournalController;
 use App\Http\Controllers\PayableController;
 use App\Http\Controllers\ReceivableController;
 use App\Http\Controllers\ReportController;
@@ -68,6 +71,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/business-unit/{businessUnit}/toggle', [BusinessUnitController::class, 'toggleActive'])->name('business-unit.toggle');
     Route::resource('business-unit', BusinessUnitController::class);
 
+    // Chart of Accounts (Daftar Akun)
+    Route::post('/chart-of-account/{chartOfAccount}/toggle', [ChartOfAccountController::class, 'toggleActive'])->name('chart-of-account.toggle');
+    Route::resource('chart-of-account', ChartOfAccountController::class)->except(['show']);
+
+    // Journal (Jurnal Umum)
+    Route::post('/journal/{journal}/approve', [JournalController::class, 'approve'])->name('journal.approve');
+    Route::post('/journal/{journal}/reject', [JournalController::class, 'reject'])->name('journal.reject');
+    Route::resource('journal', JournalController::class);
+
+    // Budget (Anggaran)
+    Route::post('/budget/{budget}/approve', [BudgetController::class, 'approve'])->name('budget.approve');
+    Route::resource('budget', BudgetController::class);
+
     // Reports
     Route::prefix('report')->name('report.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
@@ -76,6 +92,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/cash-flow', [ReportController::class, 'cashFlow'])->name('cash-flow');
         Route::get('/general-ledger', [ReportController::class, 'generalLedger'])->name('general-ledger');
         Route::get('/trial-balance', [ReportController::class, 'trialBalance'])->name('trial-balance');
+
+        // Export Excel
+        Route::get('/income-statement/excel', [ReportController::class, 'exportIncomeStatementExcel'])->name('income-statement.excel');
+        Route::get('/balance-sheet/excel', [ReportController::class, 'exportBalanceSheetExcel'])->name('balance-sheet.excel');
+        Route::get('/trial-balance/excel', [ReportController::class, 'exportTrialBalanceExcel'])->name('trial-balance.excel');
+
+        // Export PDF
+        Route::get('/income-statement/pdf', [ReportController::class, 'exportIncomeStatementPdf'])->name('income-statement.pdf');
+        Route::get('/balance-sheet/pdf', [ReportController::class, 'exportBalanceSheetPdf'])->name('balance-sheet.pdf');
+        Route::get('/trial-balance/pdf', [ReportController::class, 'exportTrialBalancePdf'])->name('trial-balance.pdf');
     });
 
     // User Management (Director only)

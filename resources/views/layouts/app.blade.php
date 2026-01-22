@@ -352,6 +352,40 @@
                 </a>
 
                 <div class="pt-6 pb-2">
+                    <p class="px-4 text-[10px] font-bold text-gray-300 uppercase tracking-[0.2em]">Akuntansi</p>
+                </div>
+
+                <a href="{{ route('chart-of-account.index') }}" 
+                   class="sidebar-link flex items-center px-4 py-3.5 text-gray-600 rounded-xl {{ request()->routeIs('chart-of-account.*') ? 'active' : '' }}">
+                    <div class="w-9 h-9 bg-gradient-to-br from-teal-100 to-teal-50 rounded-xl flex items-center justify-center mr-3">
+                        <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium">Daftar Akun</span>
+                </a>
+
+                <a href="{{ route('journal.index') }}" 
+                   class="sidebar-link flex items-center px-4 py-3.5 text-gray-600 rounded-xl {{ request()->routeIs('journal.*') ? 'active' : '' }}">
+                    <div class="w-9 h-9 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center mr-3">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium">Jurnal Umum</span>
+                </a>
+
+                <a href="{{ route('budget.index') }}" 
+                   class="sidebar-link flex items-center px-4 py-3.5 text-gray-600 rounded-xl {{ request()->routeIs('budget.*') ? 'active' : '' }}">
+                    <div class="w-9 h-9 bg-gradient-to-br from-amber-100 to-amber-50 rounded-xl flex items-center justify-center mr-3">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium">Anggaran</span>
+                </a>
+
+                <div class="pt-6 pb-2">
                     <p class="px-4 text-[10px] font-bold text-gray-300 uppercase tracking-[0.2em]">Laporan</p>
                 </div>
 
