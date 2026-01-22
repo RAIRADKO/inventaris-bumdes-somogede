@@ -1,0 +1,147 @@
+@extends('layouts.app')
+
+@section('title', 'Tambah Pengeluaran')
+@section('subtitle', 'Catat transaksi pengeluaran baru')
+
+@section('content')
+<div class="max-w-2xl mx-auto">
+    <!-- Back Button -->
+    <a href="{{ route('expense.index') }}" class="inline-flex items-center text-gray-400 hover:text-gray-600 mb-6 group">
+        <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        <span class="font-medium">Kembali ke Daftar</span>
+    </a>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-2xl shadow-soft border border-gray-100/50 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-rose-50 to-white">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-rose-400 to-rose-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-rose-200/50">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">Data Pengeluaran</h2>
+                    <p class="text-sm text-gray-400 mt-0.5">Lengkapi informasi transaksi pengeluaran</p>
+                </div>
+            </div>
+        </div>
+        
+        <form action="{{ route('expense.store') }}" method="POST" enctype="multipart/form-data" class="p-6">
+            @csrf
+
+            <div class="space-y-6">
+                <div class="grid grid-cols-2 gap-6">
+                    <!-- Date -->
+                    <div>
+                        <label for="date" class="block text-sm font-bold text-gray-700 mb-2">Tanggal *</label>
+                        <input type="date" name="date" id="date" value="{{ old('date', date('Y-m-d')) }}" required
+                               class="w-full border-2 border-gray-200 rounded-xl py-3 px-4 focus:ring-0 focus:border-primary-500 transition">
+                        @error('date')
+                        <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Amount -->
+                    <div>
+                        <label for="amount" class="block text-sm font-bold text-gray-700 mb-2">Jumlah (Rp) *</label>
+                        <input type="number" name="amount" id="amount" value="{{ old('amount') }}" required min="0" step="1"
+                               class="w-full border-2 border-gray-200 rounded-xl py-3 px-4 focus:ring-0 focus:border-primary-500 transition"
+                               placeholder="0">
+                        @error('amount')
+                        <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label for="category_id" class="block text-sm font-bold text-gray-700 mb-2">Kategori *</label>
+                    <select name="category_id" id="category_id" required
+                            class="w-full border-2 border-gray-200 rounded-xl py-3 px-4 focus:ring-0 focus:border-primary-500 transition">
+                        <option value="">Pilih Kategori</option>
+                        @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('category_id')
+                    <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Business Unit -->
+                <div>
+                    <label for="business_unit_id" class="block text-sm font-bold text-gray-700 mb-2">Unit Usaha</label>
+                    <select name="business_unit_id" id="business_unit_id"
+                            class="w-full border-2 border-gray-200 rounded-xl py-3 px-4 focus:ring-0 focus:border-primary-500 transition">
+                        <option value="">Pilih Unit Usaha</option>
+                        @foreach($businessUnits as $unit)
+                        <option value="{{ $unit->id }}" {{ old('business_unit_id') == $unit->id ? 'selected' : '' }}>
+                            {{ $unit->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Recipient -->
+                <div>
+                    <label for="recipient" class="block text-sm font-bold text-gray-700 mb-2">Penerima Pembayaran</label>
+                    <input type="text" name="recipient" id="recipient" value="{{ old('recipient') }}"
+                           class="w-full border-2 border-gray-200 rounded-xl py-3 px-4 focus:ring-0 focus:border-primary-500 transition"
+                           placeholder="Nama penerima pembayaran">
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-bold text-gray-700 mb-2">Keterangan *</label>
+                    <textarea name="description" id="description" rows="3" required
+                              class="w-full border-2 border-gray-200 rounded-xl py-3 px-4 focus:ring-0 focus:border-primary-500 transition resize-none"
+                              placeholder="Jelaskan detail transaksi pengeluaran...">{{ old('description') }}</textarea>
+                    @error('description')
+                    <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Reference -->
+                <div>
+                    <label for="reference" class="block text-sm font-bold text-gray-700 mb-2">No. Referensi</label>
+                    <input type="text" name="reference" id="reference" value="{{ old('reference') }}"
+                           class="w-full border-2 border-gray-200 rounded-xl py-3 px-4 focus:ring-0 focus:border-primary-500 transition"
+                           placeholder="No. kwitansi, invoice, dll">
+                </div>
+
+                <!-- Attachment -->
+                <div>
+                    <label for="attachment" class="block text-sm font-bold text-gray-700 mb-2">Lampiran</label>
+                    <div class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-primary-400 transition cursor-pointer group" 
+                         onclick="document.getElementById('attachment').click()">
+                        <input type="file" name="attachment" id="attachment" accept=".jpg,.jpeg,.png,.pdf" class="hidden">
+                        <div class="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-primary-100 transition">
+                            <svg class="w-7 h-7 text-gray-400 group-hover:text-primary-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm text-gray-500 font-medium">Klik untuk upload file</p>
+                        <p class="text-xs text-gray-400 mt-1">JPG, PNG, PDF (max 2MB)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-gray-100">
+                <a href="{{ route('expense.index') }}" 
+                   class="px-6 py-3 border-2 border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition">
+                    Batal
+                </a>
+                <button type="submit" class="btn-primary px-8 py-3 text-white font-semibold rounded-xl">
+                    Simpan Pengeluaran
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
