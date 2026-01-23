@@ -1,59 +1,244 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Inventaris & Keuangan BUMDes Somogede
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web untuk mengelola inventaris dan keuangan Badan Usaha Milik Desa (BUMDes) Somogede. Dibangun menggunakan Laravel dengan antarmuka modern dan fitur lengkap untuk kebutuhan akuntansi desa.
 
-## About Laravel
+## 📋 Daftar Isi
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Fitur Utama](#fitur-utama)
+- [Arsitektur Aplikasi](#arsitektur-aplikasi)
+- [Alur Kerja](#alur-kerja)
+- [Modul Aplikasi](#modul-aplikasi)
+- [Instalasi](#instalasi)
+- [Penggunaan](#penggunaan)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Modul | Deskripsi |
+|-------|-----------|
+| **Dashboard** | Statistik keuangan, grafik tren, dan ringkasan aktivitas terkini |
+| **Manajemen Kas** | Pencatatan transaksi kas masuk/keluar dengan sistem approval |
+| **Pendapatan** | Pencatatan semua sumber pendapatan unit usaha |
+| **Pengeluaran** | Pencatatan dan approval pengeluaran operasional |
+| **Piutang** | Pelacakan piutang pelanggan dengan aging report |
+| **Hutang** | Manajemen kewajiban kepada supplier |
+| **Aset** | Inventarisasi aset tetap dengan depresiasi otomatis |
+| **Unit Usaha** | Pengelolaan multiple unit bisnis BUMDes |
+| **Daftar Akun** | Chart of Accounts sesuai standar akuntansi |
+| **Jurnal Umum** | Pencatatan jurnal dengan double-entry |
+| **Anggaran** | Perencanaan dan kontrol anggaran |
+| **Laporan** | Laporan keuangan (Laba Rugi, Neraca, Arus Kas) |
 
-## Learning Laravel
+## 🏗️ Arsitektur Aplikasi
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      PRESENTASI                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │   Blade     │  │   Layout    │  │ Components  │          │
+│  │   Views     │  │   Admin     │  │  Reusable   │          │
+│  └─────────────┘  └─────────────┘  └─────────────┘          │
+└─────────────────────────────────────────────────────────────┘
+                            │
+┌─────────────────────────────────────────────────────────────┐
+│                      CONTROLLER                              │
+│  Dashboard │ Cash │ Income │ Expense │ Report │ dll        │
+└─────────────────────────────────────────────────────────────┘
+                            │
+┌─────────────────────────────────────────────────────────────┐
+│                       SERVICE                                │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                  JournalService                      │    │
+│  │   - Membuat jurnal otomatis dari transaksi          │    │
+│  │   - Sinkronisasi dengan Chart of Accounts           │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+                            │
+┌─────────────────────────────────────────────────────────────┐
+│                        MODEL                                 │
+│  User │ BusinessUnit │ Journal │ ChartOfAccount │ dll      │
+└─────────────────────────────────────────────────────────────┘
+                            │
+┌─────────────────────────────────────────────────────────────┐
+│                      DATABASE (MySQL)                        │
+└─────────────────────────────────────────────────────────────┘
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🔄 Alur Kerja
 
-## Laravel Sponsors
+### 1. Alur Transaksi Umum
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```mermaid
+flowchart LR
+    A[Input Transaksi] --> B{Draft}
+    B --> C[Submit]
+    C --> D{Review}
+    D -->|Approve| E[Approved]
+    D -->|Reject| F[Rejected]
+    E --> G[Jurnal Otomatis]
+    G --> H[Update Laporan]
+```
 
-### Premium Partners
+### 2. Sistem Approval
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Transaksi melalui workflow persetujuan bertingkat:
 
-## Contributing
+| Status | Warna | Keterangan |
+|--------|-------|------------|
+| `draft` | 🟡 Kuning | Baru dibuat, bisa diedit |
+| `pending` | 🔵 Biru | Menunggu persetujuan |
+| `approved` | 🟢 Hijau | Disetujui, masuk jurnal |
+| `rejected` | 🔴 Merah | Ditolak, perlu revisi |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Sinkronisasi Jurnal
 
-## Code of Conduct
+Setiap transaksi yang **approved** otomatis membuat jurnal:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+Contoh: Transaksi Pendapatan Rp 1.000.000
 
-## Security Vulnerabilities
+Jurnal Otomatis:
+┌─────────────────────────────────────────────────┐
+│ Debit  : Kas                    Rp 1.000.000   │
+│ Kredit : Pendapatan Usaha       Rp 1.000.000   │
+└─────────────────────────────────────────────────┘
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 📦 Modul Aplikasi
 
-## License
+### Manajemen Kas (`/cash`)
+- Mencatat transaksi kas harian
+- Laporan kas harian
+- Rekonsiliasi saldo
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Pendapatan (`/income`)
+- Input sumber pendapatan
+- Kategori pendapatan per unit usaha
+- Tracking status pembayaran
+
+### Pengeluaran (`/expense`)
+- Pencatatan pengeluaran operasional
+- Approval bertingkat
+- Bukti transaksi (upload)
+
+### Piutang (`/receivable`)
+- Catat piutang pelanggan
+- Pembayaran cicilan
+- **Aging Report**: Analisis umur piutang
+
+### Hutang (`/payable`)
+- Manajemen kewajiban ke supplier
+- Jadwal pembayaran
+- Tracking jatuh tempo
+
+### Aset (`/asset`)
+- Inventarisasi aset tetap
+- Kategori aset
+- Perhitungan depresiasi
+- Disposal aset
+
+### Unit Usaha (`/business-unit`)
+- Multi unit bisnis
+- Laporan terpisah per unit
+- Aktivasi/nonaktif unit
+
+### Daftar Akun (`/chart-of-account`)
+- Chart of Accounts lengkap
+- Tipe: Aset, Liabilitas, Ekuitas, Pendapatan, Beban
+- Kode akun terstruktur
+
+### Jurnal Umum (`/journal`)
+- Double-entry bookkeeping
+- Jurnal manual & otomatis
+- Approval jurnal
+
+### Anggaran (`/budget`)
+- Perencanaan anggaran tahunan
+- Item anggaran detail
+- Monitoring realisasi
+
+### Laporan (`/report`)
+- **Laporan Laba Rugi**: Pendapatan vs Beban
+- **Neraca**: Posisi keuangan
+- **Arus Kas**: Cash flow statement
+- **Buku Besar**: Detail per akun
+- **Neraca Saldo**: Trial balance
+- Export: PDF & Excel
+
+## ⚙️ Instalasi
+
+### Prasyarat
+- PHP >= 8.1
+- Composer
+- MySQL / MariaDB
+- Node.js & NPM
+
+### Langkah Instalasi
+
+```bash
+# 1. Clone repository
+git clone [repository-url]
+cd inventaris-bumdes-somogede
+
+# 2. Install dependencies
+composer install
+npm install
+
+# 3. Setup environment
+cp .env.example .env
+php artisan key:generate
+
+# 4. Konfigurasi database di .env
+# DB_DATABASE=bumdes_somogede
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# 5. Migrasi & seeder
+php artisan migrate --seed
+
+# 6. Build assets
+npm run build
+
+# 7. Jalankan server
+php artisan serve
+```
+
+## 📖 Penggunaan
+
+### Role Pengguna
+
+| Role | Hak Akses |
+|------|-----------|
+| **Direktur** | Full access + manajemen user |
+| **Bendahara** | Transaksi keuangan + approval |
+| **Staff** | Input transaksi dasar |
+
+### Login Default
+
+```
+Email    : admin@bumdes.test
+Password : password
+```
+
+### Workflow Harian
+
+1. **Login** ke sistem
+2. **Input transaksi** harian (kas, pendapatan, pengeluaran)
+3. **Submit** transaksi untuk approval
+4. **Approve/Reject** oleh pejabat berwenang
+5. **Cek laporan** untuk monitoring keuangan
+
+## 🛡️ Keamanan
+
+- Autentikasi berbasis session
+- Role-based access control
+- Rate limiting untuk login
+- Honeypot protection
+- CSRF protection
+
+## 📝 Lisensi
+
+MIT License - Bebas digunakan untuk keperluan BUMDes.
+
+---
+
+**Dikembangkan untuk BUMDes Somogede** 🏘️
