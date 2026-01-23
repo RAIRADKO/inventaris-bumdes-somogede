@@ -46,6 +46,9 @@ class DatabaseSeeder extends Seeder
 
         // Create Transaction Categories
         $this->seedTransactionCategories();
+
+        // Seed demo data
+        $this->call(DemoSeeder::class);
     }
 
     private function seedChartOfAccounts(): void

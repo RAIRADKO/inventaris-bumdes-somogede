@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CashTransaction;
 use App\Models\TransactionCategory;
+use App\Services\JournalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -155,9 +156,15 @@ class CashController extends Controller
             'approved_at' => now(),
         ]);
 
-        // TODO: Create journal entry
+        // Create journal entry
+        $journalService = new JournalService();
+        $journal = $journalService->createFromCash($cash);
 
-        return back()->with('success', 'Transaksi berhasil disetujui.');
+        if ($journal) {
+            return back()->with('success', 'Transaksi berhasil disetujui dan jurnal telah dibuat.');
+        }
+
+        return back()->with('warning', 'Transaksi berhasil disetujui, tetapi jurnal tidak dapat dibuat. Pastikan kategori memiliki akun yang terkait.');
     }
 
     public function reject(Request $request, CashTransaction $cash)

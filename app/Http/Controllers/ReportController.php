@@ -114,7 +114,7 @@ class ReportController extends Controller
         $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', now()->format('Y-m-d'));
 
-        // Operating activities
+        // Operating activities - from approved income and expense transactions
         $operatingIncome = IncomeTransaction::approved()
             ->whereBetween('date', [$startDate, $endDate])
             ->sum('amount');
@@ -125,18 +125,34 @@ class ReportController extends Controller
 
         $netOperating = $operatingIncome - $operatingExpense;
 
-        // Investment activities (asset purchases/sales)
-        $investingActivities = 0; // TODO: Calculate from asset transactions
+        // Investment activities - from asset acquisitions and disposals
+        $assetPurchases = \App\Models\Asset::whereBetween('acquisition_date', [$startDate, $endDate])
+            ->sum('acquisition_cost');
+        
+        $assetSales = \App\Models\Asset::whereBetween('disposal_date', [$startDate, $endDate])
+            ->whereNotNull('disposal_value')
+            ->sum('disposal_value');
+        
+        $investingActivities = $assetSales - $assetPurchases;
 
-        // Financing activities (capital/loans)
-        $financingActivities = 0; // TODO: Calculate from capital records
+        // Financing activities - from capital records
+        $capitalIn = \App\Models\CapitalRecord::whereIn('type', ['initial_capital', 'village_investment', 'community_investment'])
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('amount');
+        
+        $capitalOut = \App\Models\CapitalRecord::whereIn('type', ['dividend_distribution'])
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('amount');
+        
+        $financingActivities = $capitalIn - $capitalOut;
 
         $netCashFlow = $netOperating + $investingActivities + $financingActivities;
 
         return view('report.cash-flow', compact(
             'startDate', 'endDate',
             'operatingIncome', 'operatingExpense', 'netOperating',
-            'investingActivities', 'financingActivities', 'netCashFlow'
+            'investingActivities', 'financingActivities', 'netCashFlow',
+            'assetPurchases', 'assetSales', 'capitalIn', 'capitalOut'
         ));
     }
 

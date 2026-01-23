@@ -78,8 +78,12 @@
             </h3>
             <table class="w-full mt-2">
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-4 text-sm text-gray-900">Pembelian/Penjualan Aset Tetap</td>
-                    <td class="py-3 px-4 text-sm text-right text-gray-600 font-medium">Rp {{ number_format($investingActivities ?? 0, 0, ',', '.') }}</td>
+                    <td class="py-3 px-4 text-sm text-gray-900">Penerimaan dari Penjualan Aset</td>
+                    <td class="py-3 px-4 text-sm text-right text-green-600 font-medium">Rp {{ number_format($assetSales ?? 0, 0, ',', '.') }}</td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 text-sm text-gray-900">Pembelian Aset Tetap</td>
+                    <td class="py-3 px-4 text-sm text-right text-red-600 font-medium">(Rp {{ number_format($assetPurchases ?? 0, 0, ',', '.') }})</td>
                 </tr>
                 <tr class="font-semibold border-t-2 border-blue-200 bg-blue-50">
                     <td class="py-3 px-4 text-blue-900">Arus Kas Bersih dari Aktivitas Investasi</td>
@@ -100,8 +104,12 @@
             </h3>
             <table class="w-full mt-2">
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-4 text-sm text-gray-900">Penerimaan/Pembayaran Modal & Pinjaman</td>
-                    <td class="py-3 px-4 text-sm text-right text-gray-600 font-medium">Rp {{ number_format($financingActivities ?? 0, 0, ',', '.') }}</td>
+                    <td class="py-3 px-4 text-sm text-gray-900">Penerimaan Modal/Penyertaan</td>
+                    <td class="py-3 px-4 text-sm text-right text-green-600 font-medium">Rp {{ number_format($capitalIn ?? 0, 0, ',', '.') }}</td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 text-sm text-gray-900">Pembagian SHU/Dividen</td>
+                    <td class="py-3 px-4 text-sm text-right text-red-600 font-medium">(Rp {{ number_format($capitalOut ?? 0, 0, ',', '.') }})</td>
                 </tr>
                 <tr class="font-semibold border-t-2 border-purple-200 bg-purple-50">
                     <td class="py-3 px-4 text-purple-900">Arus Kas Bersih dari Aktivitas Pendanaan</td>

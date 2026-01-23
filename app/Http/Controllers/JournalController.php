@@ -92,7 +92,7 @@ class JournalController extends Controller
                 'business_unit_id' => $validated['business_unit_id'],
                 'fiscal_period_id' => $fiscalPeriod?->id,
                 'status' => 'draft',
-                'type' => 'general',
+                'type' => 'manual',
                 'created_by' => auth()->id(),
             ]);
 

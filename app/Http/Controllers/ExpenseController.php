@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BusinessUnit;
 use App\Models\ExpenseTransaction;
 use App\Models\TransactionCategory;
+use App\Services\JournalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -162,7 +163,15 @@ class ExpenseController extends Controller
             'approved_at' => now(),
         ]);
 
-        return back()->with('success', 'Transaksi berhasil disetujui.');
+        // Create journal entry
+        $journalService = new JournalService();
+        $journal = $journalService->createFromExpense($expense);
+
+        if ($journal) {
+            return back()->with('success', 'Transaksi berhasil disetujui dan jurnal telah dibuat.');
+        }
+
+        return back()->with('warning', 'Transaksi berhasil disetujui, tetapi jurnal tidak dapat dibuat. Pastikan kategori memiliki akun yang terkait.');
     }
 
     public function reject(ExpenseTransaction $expense)

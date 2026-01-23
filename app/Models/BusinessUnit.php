@@ -52,4 +52,10 @@ class BusinessUnit extends Model
     {
         return $this->hasMany(Budget::class);
     }
+
+    // Scope for active business units
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }
