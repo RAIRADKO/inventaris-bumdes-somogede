@@ -95,6 +95,50 @@
             50% { transform: translateY(-5px); }
         }
         
+        /* Toast Notification Animations */
+        @keyframes bounce-once {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(0.95); }
+            75% { transform: scale(1.05); }
+        }
+        
+        .animate-bounce-once {
+            animation: bounce-once 0.6s ease-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+            20%, 40%, 60%, 80% { transform: translateX(2px); }
+        }
+        
+        .animate-shake {
+            animation: shake 0.5s ease-out;
+        }
+        
+        @keyframes progress-bar {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        
+        .animate-progress-bar {
+            animation: progress-bar 5s linear forwards;
+        }
+        
+        .animate-progress-bar-slow {
+            animation: progress-bar 8s linear forwards;
+        }
+        
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        
+        .animate-bounce-slow {
+            animation: bounce-slow 1.5s ease-in-out infinite;
+        }
+        
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -472,41 +516,207 @@
 
             <!-- Page content -->
             <main class="p-6 lg:p-8 animate-fade-in">
-                <!-- Alerts -->
-                @if(session('success'))
-                <div class="mb-6 p-4 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/50 rounded-2xl flex items-center shadow-soft animate-slide-up" 
-                     x-data="{ show: true }" x-show="show"
-                     x-transition:leave="transition ease-in duration-200"
-                     x-transition:leave-start="opacity-100 transform translate-y-0"
-                     x-transition:leave-end="opacity-0 transform -translate-y-4">
-                    <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center mr-4">
-                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                <!-- Toast Notifications Container -->
+                @if(session('success') || session('error') || session('warning') || session('info'))
+                <div x-data="toastNotification()" x-init="init()" class="fixed top-6 right-6 z-50 flex flex-col space-y-4">
+                    @if(session('success'))
+                    <div x-show="showSuccess" 
+                         x-transition:enter="transition ease-out duration-500"
+                         x-transition:enter-start="opacity-0 transform translate-x-full scale-95"
+                         x-transition:enter-end="opacity-100 transform translate-x-0 scale-100"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 transform translate-x-0 scale-100"
+                         x-transition:leave-end="opacity-0 transform translate-x-full scale-95"
+                         class="min-w-[360px] max-w-md bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-emerald-100/50 overflow-hidden"
+                         style="box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.25);">
+                        
+                        <!-- Success Glow Effect -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-emerald-400/10 via-green-400/10 to-emerald-400/10 animate-pulse"></div>
+                        
+                        <div class="relative p-5">
+                            <div class="flex items-start">
+                                <!-- Animated Icon -->
+                                <div class="flex-shrink-0 relative">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110">
+                                        <svg class="w-6 h-6 text-white animate-bounce-once" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Sparkles -->
+                                    <div class="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+                                    <div class="absolute -bottom-1 -left-1 w-2 h-2 bg-emerald-400 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="ml-4 flex-1 min-w-0">
+                                    <h4 class="text-base font-bold text-emerald-800 flex items-center">
+                                        <span>Berhasil!</span>
+                                        <span class="ml-2 text-lg">🎉</span>
+                                    </h4>
+                                    <p class="mt-1 text-sm text-emerald-600 leading-relaxed">{{ session('success') }}</p>
+                                </div>
+                                
+                                <!-- Close Button -->
+                                <button @click="showSuccess = false" 
+                                        class="flex-shrink-0 ml-3 p-2 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-100 rounded-xl transition-all duration-200 hover:rotate-90">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="h-1 bg-emerald-100">
+                            <div class="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-400 rounded-full animate-progress-bar"></div>
+                        </div>
                     </div>
-                    <span class="text-emerald-700 font-medium flex-1">{{ session('success') }}</span>
-                    <button @click="show = false" class="p-2 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-100 rounded-xl transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-                @endif
+                    @endif
 
-                @if(session('error'))
-                <div class="mb-6 p-4 bg-gradient-to-r from-rose-50 to-red-50 border border-rose-200/50 rounded-2xl flex items-center shadow-soft animate-slide-up" 
-                     x-data="{ show: true }" x-show="show">
-                    <div class="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center mr-4">
-                        <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                    @if(session('error'))
+                    <div x-show="showError" 
+                         x-transition:enter="transition ease-out duration-500"
+                         x-transition:enter-start="opacity-0 transform translate-x-full scale-95"
+                         x-transition:enter-end="opacity-100 transform translate-x-0 scale-100"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 transform translate-x-0 scale-100"
+                         x-transition:leave-end="opacity-0 transform translate-x-full scale-95"
+                         class="min-w-[360px] max-w-md bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-rose-100/50 overflow-hidden"
+                         style="box-shadow: 0 25px 50px -12px rgba(244, 63, 94, 0.25);">
+                        
+                        <!-- Error Glow Effect -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-rose-400/10 via-red-400/10 to-rose-400/10 animate-pulse"></div>
+                        
+                        <div class="relative p-5">
+                            <div class="flex items-start">
+                                <!-- Animated Icon -->
+                                <div class="flex-shrink-0 relative">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-rose-400 to-red-500 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110 animate-shake">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Warning Ripple -->
+                                    <div class="absolute inset-0 rounded-2xl bg-rose-400 animate-ping opacity-20"></div>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="ml-4 flex-1 min-w-0">
+                                    <h4 class="text-base font-bold text-rose-800 flex items-center">
+                                        <span>Gagal!</span>
+                                        <span class="ml-2 text-lg">⚠️</span>
+                                    </h4>
+                                    <p class="mt-1 text-sm text-rose-600 leading-relaxed">{{ session('error') }}</p>
+                                </div>
+                                
+                                <!-- Close Button -->
+                                <button @click="showError = false" 
+                                        class="flex-shrink-0 ml-3 p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-100 rounded-xl transition-all duration-200 hover:rotate-90">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="h-1 bg-rose-100">
+                            <div class="h-full bg-gradient-to-r from-rose-400 via-red-500 to-rose-400 rounded-full animate-progress-bar-slow"></div>
+                        </div>
                     </div>
-                    <span class="text-rose-700 font-medium flex-1">{{ session('error') }}</span>
-                    <button @click="show = false" class="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-100 rounded-xl transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
+                    @endif
+
+                    @if(session('warning'))
+                    <div x-show="showWarning" 
+                         x-transition:enter="transition ease-out duration-500"
+                         x-transition:enter-start="opacity-0 transform translate-x-full scale-95"
+                         x-transition:enter-end="opacity-100 transform translate-x-0 scale-100"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 transform translate-x-0 scale-100"
+                         x-transition:leave-end="opacity-0 transform translate-x-full scale-95"
+                         class="min-w-[360px] max-w-md bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-100/50 overflow-hidden"
+                         style="box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.25);">
+                        
+                        <div class="absolute inset-0 bg-gradient-to-r from-amber-400/10 via-yellow-400/10 to-amber-400/10 animate-pulse"></div>
+                        
+                        <div class="relative p-5">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 relative">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <div class="ml-4 flex-1 min-w-0">
+                                    <h4 class="text-base font-bold text-amber-800 flex items-center">
+                                        <span>Peringatan</span>
+                                        <span class="ml-2 text-lg">⚡</span>
+                                    </h4>
+                                    <p class="mt-1 text-sm text-amber-600 leading-relaxed">{{ session('warning') }}</p>
+                                </div>
+                                
+                                <button @click="showWarning = false" 
+                                        class="flex-shrink-0 ml-3 p-2 text-amber-400 hover:text-amber-600 hover:bg-amber-100 rounded-xl transition-all duration-200 hover:rotate-90">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="h-1 bg-amber-100">
+                            <div class="h-full bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 rounded-full animate-progress-bar"></div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(session('info'))
+                    <div x-show="showInfo" 
+                         x-transition:enter="transition ease-out duration-500"
+                         x-transition:enter-start="opacity-0 transform translate-x-full scale-95"
+                         x-transition:enter-end="opacity-100 transform translate-x-0 scale-100"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 transform translate-x-0 scale-100"
+                         x-transition:leave-end="opacity-0 transform translate-x-full scale-95"
+                         class="min-w-[360px] max-w-md bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-blue-100/50 overflow-hidden"
+                         style="box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25);">
+                        
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-400/10 via-indigo-400/10 to-blue-400/10 animate-pulse"></div>
+                        
+                        <div class="relative p-5">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 relative">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <div class="ml-4 flex-1 min-w-0">
+                                    <h4 class="text-base font-bold text-blue-800 flex items-center">
+                                        <span>Informasi</span>
+                                        <span class="ml-2 text-lg">💡</span>
+                                    </h4>
+                                    <p class="mt-1 text-sm text-blue-600 leading-relaxed">{{ session('info') }}</p>
+                                </div>
+                                
+                                <button @click="showInfo = false" 
+                                        class="flex-shrink-0 ml-3 p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-100 rounded-xl transition-all duration-200 hover:rotate-90">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="h-1 bg-blue-100">
+                            <div class="h-full bg-gradient-to-r from-blue-400 via-indigo-500 to-blue-400 rounded-full animate-progress-bar"></div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
                 @endif
 
@@ -522,6 +732,160 @@
         </div>
     </div>
 
+    <!-- Global Delete Confirmation Modal -->
+    <div x-data="deleteConfirmation()" x-cloak>
+        <div x-show="isOpen" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-[100] overflow-y-auto"
+             @keydown.escape.window="close()">
+            
+            <!-- Backdrop -->
+            <div class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm" @click="close()"></div>
+            
+            <!-- Modal -->
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div x-show="isOpen"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 scale-90 translate-y-4"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 scale-90 translate-y-4"
+                     class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden"
+                     @click.stop>
+                    
+                    <!-- Decorative Top Bar -->
+                    <div class="h-2 bg-gradient-to-r from-rose-400 via-red-500 to-rose-400"></div>
+                    
+                    <!-- Content -->
+                    <div class="p-8 text-center">
+                        <!-- Animated Icon -->
+                        <div class="mx-auto mb-6 relative">
+                            <div class="w-20 h-20 bg-gradient-to-br from-rose-100 to-red-50 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                                <div class="w-16 h-16 bg-gradient-to-br from-rose-400 to-red-500 rounded-full flex items-center justify-center shadow-lg animate-bounce-slow">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <!-- Warning Ripple -->
+                            <div class="absolute inset-0 rounded-full bg-rose-400/20 animate-ping"></div>
+                        </div>
+                        
+                        <!-- Title -->
+                        <h3 class="text-2xl font-bold text-gray-800 mb-3">
+                            Konfirmasi Hapus
+                        </h3>
+                        
+                        <!-- Message -->
+                        <p class="text-gray-500 mb-2" x-text="message"></p>
+                        <p class="text-sm text-rose-500 font-medium mb-8">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            Tindakan ini tidak dapat dibatalkan!
+                        </p>
+                        
+                        <!-- Buttons -->
+                        <div class="flex items-center justify-center space-x-4">
+                            <button @click="close()" 
+                                    class="px-8 py-3 bg-gray-100 text-gray-700 font-semibold rounded-2xl hover:bg-gray-200 transition-all duration-200 hover:scale-105">
+                                <span class="flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                    Batal
+                                </span>
+                            </button>
+                            <button @click="confirmDelete()" 
+                                    class="px-8 py-3 bg-gradient-to-r from-rose-500 to-red-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 hover:from-rose-600 hover:to-red-700">
+                                <span class="flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    Ya, Hapus!
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Delete Confirmation Modal Component
+        function deleteConfirmation() {
+            return {
+                isOpen: false,
+                message: '',
+                formId: null,
+                init() {
+                    // Listen for custom event to open modal
+                    document.addEventListener('open-delete-modal', (e) => {
+                        this.open(e.detail.formId, e.detail.message);
+                    });
+                },
+                open(formId, message = 'Apakah Anda yakin ingin menghapus data ini?') {
+                    this.formId = formId;
+                    this.message = message;
+                    this.isOpen = true;
+                    document.body.style.overflow = 'hidden';
+                },
+                close() {
+                    this.isOpen = false;
+                    document.body.style.overflow = '';
+                },
+                confirmDelete() {
+                    if (this.formId) {
+                        document.getElementById(this.formId).submit();
+                    }
+                    this.close();
+                }
+            }
+        }
+        
+        // Global function to trigger delete modal from anywhere
+        function confirmDeleteModal(formId, message = 'Apakah Anda yakin ingin menghapus data ini?') {
+            document.dispatchEvent(new CustomEvent('open-delete-modal', { 
+                detail: { formId, message } 
+            }));
+            return false; // Prevent form submission
+        }
+
+        // Toast Notification Component
+        function toastNotification() {
+            return {
+                showSuccess: true,
+                showError: true,
+                showWarning: true,
+                showInfo: true,
+                init() {
+                    // Auto-dismiss success after 5 seconds
+                    if (this.showSuccess) {
+                        setTimeout(() => { this.showSuccess = false; }, 5000);
+                    }
+                    // Auto-dismiss error after 8 seconds (longer for errors)
+                    if (this.showError) {
+                        setTimeout(() => { this.showError = false; }, 8000);
+                    }
+                    // Auto-dismiss warning after 5 seconds
+                    if (this.showWarning) {
+                        setTimeout(() => { this.showWarning = false; }, 5000);
+                    }
+                    // Auto-dismiss info after 5 seconds
+                    if (this.showInfo) {
+                        setTimeout(() => { this.showInfo = false; }, 5000);
+                    }
+                }
+            }
+        }
+    </script>
     @stack('scripts')
 </body>
 </html>
